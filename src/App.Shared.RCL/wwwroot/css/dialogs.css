@@ -152,7 +152,7 @@
     font-size: 1.05rem !important;
     font-weight: 700 !important;
     line-height: 1.25 !important;
-    letter-spacing: -0.02em !important;
+    letter-spacing: -0.02em;
     color: var(--mud-palette-text-primary) !important;
     padding: 0.55rem 0.75rem !important;
 }
@@ -164,7 +164,7 @@
 .edit-daily-field-header textarea.mud-input-slot {
     font-size: 0.875rem !important;
     font-weight: 500 !important;
-    letter-spacing: 0 !important;
+    letter-spacing: 0;
     line-height: 1.5 !important;
 }
 .edit-daily-field-header textarea.mud-input-slot {
@@ -177,7 +177,7 @@
     font-family: var(--hab-font-sans) !important;
     font-size: 0.68rem !important;
     font-weight: 700 !important;
-    letter-spacing: 0.08em !important;
+    letter-spacing: 0.08em;
     text-transform: uppercase !important;
     color: var(--mud-palette-text-secondary) !important;
     margin-bottom: 0.35rem !important;
