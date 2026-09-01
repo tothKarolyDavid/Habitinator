@@ -5,9 +5,12 @@
     flex-direction: column;
     gap: 0;
     overflow: hidden;
-    /* eyebrow wash like hab-modal */
-    background: linear-gradient(180deg, color-mix(in srgb, var(--mud-palette-primary) 7%, var(--mud-palette-surface)), var(--mud-palette-surface));
+    background: var(--mud-palette-surface);
     border-radius: var(--hab-modal-radius);
+    border: 1px solid color-mix(in srgb, var(--mud-palette-divider) 55%, transparent);
+    box-shadow:
+        0 1px 3px light-dark(rgba(15, 23, 42, 0.08), rgba(0, 0, 0, 0.45)),
+        0 12px 32px light-dark(rgba(15, 23, 42, 0.12), rgba(0, 0, 0, 0.6));
 }
 
 .onboarding-header {
@@ -18,15 +21,6 @@
     padding: 1.1rem 1.1rem 0.9rem;
     position: relative;
     border-bottom: 1px solid color-mix(in srgb, var(--mud-palette-divider) 65%, transparent);
-}
-
-.onboarding-header::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 3px;
-    background: var(--hab-brand-gradient);
-    opacity: 0.9;
 }
 
 .onboarding-header__close {

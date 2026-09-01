@@ -7,9 +7,12 @@
      role="button"
      tabindex="0"
      aria-label="Dismiss notification">
+    <span class="undo-toast-icon" aria-hidden="true">
+        <MudIcon Icon="@Icons.Material.Filled.History" Size="Size.Small"/>
+    </span>
     <span class="undo-toast-message">@Description</span>
     <button class="undo-toast-btn" type="button" @onclick="HandleUndo" @onclick:stopPropagation="true">
-        <span aria-hidden="true" style="font-family: var(--hab-font-mono); font-size: 0.7rem; opacity: 0.85;">↩</span>
+        <MudIcon Icon="@Icons.Material.Filled.Undo" Size="Size.Small"/>
         <span>Undo</span>
     </button>
 </div>

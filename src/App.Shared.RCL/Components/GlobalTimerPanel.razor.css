@@ -486,11 +486,10 @@
     overflow-y: hidden;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
-    transition: min-height var(--dur-normal) var(--ease-out), opacity var(--dur-normal) ease;
+    transition: opacity var(--dur-normal) ease, transform var(--dur-normal) var(--ease-out);
 }
 
 .timer-pomodoro-status-strip--empty {
-    min-height: 14px;
     opacity: 0.6;
 }
 

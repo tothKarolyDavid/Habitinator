@@ -610,7 +610,7 @@ public partial class StatisticsPanel : IDisposable
         return $"{totalMinutes / 60}h {totalMinutes % 60}m";
     }
 
-    private string FormatRange(DateOnly from, DateOnly to) => $"{DateFormatService.Format(from)} → {DateFormatService.Format(to)}";
+    private string FormatRange(DateOnly from, DateOnly to) => $"{DateFormatService.Format(from)} - {DateFormatService.Format(to)}";
 
     private static string GetWeeklyDeltaClass(int percentChange) =>
         percentChange >= 0 ? "stats-weekly-tile__delta stats-weekly-tile__delta--up" : "stats-weekly-tile__delta stats-weekly-tile__delta--down";

@@ -637,61 +637,60 @@ input[type="number"].mud-input-slot {
     }
 }
 
-/* -- App toasts, bottom-left snackbar: ledger card, not generic pill -- */
+/* -- App toasts: clean, tactile card matching Habitinator surfaces -- */
 .habitinator-toast {
     position: relative;
     overflow: hidden;
     padding: 0 !important;
-    background:
-        radial-gradient(420px 120px at 18% 0%, color-mix(in srgb, var(--toast-accent, var(--mud-palette-primary)) 7%, transparent), transparent 62%),
-        var(--mud-palette-surface) !important;
+    background: var(--mud-palette-surface) !important;
     color: var(--mud-palette-text-primary) !important;
-    border-radius: 14px !important;
-    border: 1px solid color-mix(in srgb, var(--mud-palette-divider) 68%, transparent) !important;
+    border-radius: var(--radius-xl) !important;
+    border: 1px solid var(--hab-border-card) !important;
     box-shadow:
-        0 1px 0 rgba(15,23,42,0.04),
-        0 10px 22px rgba(15,23,42,0.08),
-        0 22px 44px rgba(15,23,42,0.11) !important;
+        0 1px 3px light-dark(rgba(15, 23, 42, 0.08), rgba(0, 0, 0, 0.45)),
+        0 8px 24px light-dark(rgba(15, 23, 42, 0.10), rgba(0, 0, 0, 0.55)) !important;
     cursor: pointer;
-    animation: toast-enter 0.32s var(--ease-out-expo);
+    animation: toast-enter 0.28s var(--ease-out-expo);
     align-self: flex-start !important;
     width: fit-content !important;
     min-width: 280px !important;
-    max-width: min(26rem, calc(100vw - 1.5rem)) !important;
+    max-width: min(24rem, calc(100vw - 1.5rem)) !important;
+    transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) ease;
 }
 
-/* Hairline top accent, board-card lineage. Left stripe removed to avoid AI-default */
-.habitinator-toast::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 2px;
-    background: var(--toast-accent, var(--mud-palette-primary));
-    opacity: 0.95;
-    pointer-events: none;
+.habitinator-toast:hover {
+    box-shadow:
+        0 2px 6px light-dark(rgba(15, 23, 42, 0.10), rgba(0, 0, 0, 0.5)),
+        0 12px 32px light-dark(rgba(15, 23, 42, 0.14), rgba(0, 0, 0, 0.65)) !important;
 }
 
-.habitinator-toast::after {
-    content: "";
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 2px;
-    background: color-mix(in srgb, var(--toast-accent, var(--mud-palette-primary)) 22%, transparent);
-    opacity: 0.45;
-    pointer-events: none;
+.habitinator-toast:focus-visible {
+    outline: 2px solid var(--mud-palette-primary);
+    outline-offset: 2px;
 }
 
 .habitinator-toast.severity-info    { --toast-accent: var(--mud-palette-primary); }
-.habitinator-toast.severity-success { --toast-accent: #16a34a; }
-.habitinator-toast.severity-warning { --toast-accent: #d97706; }
-.habitinator-toast.severity-error   { --toast-accent: #dc2626; }
+.habitinator-toast.severity-success { --toast-accent: var(--hab-accent-success, #16a34a); }
+.habitinator-toast.severity-warning { --toast-accent: #f59e0b; }
+.habitinator-toast.severity-error   { --toast-accent: var(--hab-type-habit-bad, #dc2626); }
 
 .habitinator-toast.undo-toast { --toast-accent: var(--mud-palette-primary); }
-.habitinator-toast.undo-toast::after { opacity: 0.22; }
 
 @keyframes toast-enter {
-    from { opacity: 0; transform: translateY(8px) scale(0.98); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .habitinator-toast {
+        animation: none !important;
+    }
 }
 
 .habitinator-toast .mud-snackbar-icon,
@@ -706,20 +705,20 @@ input[type="number"].mud-input-slot {
     margin: 0 !important;
 }
 
-/* -- Typed message toast: mono eyebrow + tight sans message -- */
+/* -- Typed message toast: clean horizontal flow, direct typography -- */
 .toast-content {
     display: flex;
-    align-items: flex-start;
-    gap: 0.7rem;
+    align-items: center;
+    gap: var(--space-4);
     width: 100%;
-    padding: 0.85rem 0.9rem 0.85rem 0.85rem;
-    position: relative;
+    padding: 0.75rem 0.85rem;
+    box-sizing: border-box;
 }
 
 .toast-content__main {
     display: flex;
-    align-items: flex-start;
-    gap: 0.7rem;
+    align-items: center;
+    gap: 0.65rem;
     flex: 1;
     min-width: 0;
 }
@@ -729,47 +728,24 @@ input[type="number"].mud-input-slot {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 1.9rem;
-    height: 1.9rem;
-    margin-top: 0.05rem;
-    border-radius: 8px;
-    background: color-mix(in srgb, var(--toast-accent, var(--mud-palette-primary)) 11%, var(--mud-palette-surface));
-    border: 1px solid color-mix(in srgb, var(--toast-accent, var(--mud-palette-primary)) 16%, transparent);
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--toast-accent, var(--mud-palette-primary)) 12%, transparent);
     color: var(--toast-accent, var(--mud-palette-primary));
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.55);
 }
 
 .toast-content-icon .mud-icon {
-    font-size: 1.05rem !important;
-}
-
-.toast-content__body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.18rem;
-    min-width: 0;
-    flex: 1;
-    padding-top: 0.05rem;
-}
-
-.toast-content__eyebrow {
-    font-family: var(--hab-font-mono);
-    font-size: 0.62rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--toast-accent, var(--mud-palette-primary));
-    line-height: 1;
-    opacity: 0.95;
+    font-size: 1.15rem !important;
 }
 
 .toast-content-message {
     font-family: var(--hab-font-sans);
-    font-size: 0.84rem;
-    font-weight: 620;
+    font-size: 0.85rem;
+    font-weight: 550;
     letter-spacing: -0.01em;
     color: var(--mud-palette-text-primary);
-    line-height: 1.42;
+    line-height: 1.4;
     overflow-wrap: anywhere;
 }
 
@@ -778,12 +754,12 @@ input[type="number"].mud-input-slot {
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 1.7rem;
-    height: 1.7rem;
-    margin-top: 0.02rem;
-    border: 1px solid color-mix(in srgb, var(--mud-palette-divider) 62%, transparent);
-    border-radius: 7px;
-    background: color-mix(in srgb, var(--mud-palette-surface) 96%, transparent);
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-left: 0.25rem;
+    border: 1px solid color-mix(in srgb, var(--mud-palette-divider) 60%, transparent);
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--mud-palette-surface) 90%, transparent);
     color: var(--mud-palette-text-secondary);
     cursor: pointer;
     padding: 0;
@@ -791,43 +767,54 @@ input[type="number"].mud-input-slot {
 }
 
 .toast-content-dismiss:hover {
-    background: color-mix(in srgb, var(--mud-palette-text-primary) 6%, var(--mud-palette-surface));
-    border-color: color-mix(in srgb, var(--mud-palette-divider) 78%, transparent);
+    background: color-mix(in srgb, var(--mud-palette-text-primary) 8%, var(--mud-palette-surface));
+    border-color: color-mix(in srgb, var(--mud-palette-divider) 90%, transparent);
     color: var(--mud-palette-text-primary);
 }
 
 .toast-content-dismiss:active {
-    transform: scale(0.96);
+    transform: scale(0.94);
 }
 
-.toast-progress {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 2px;
-    background: var(--toast-accent, var(--mud-palette-primary));
-    opacity: 0.0;
-    pointer-events: none;
+.toast-content-dismiss:focus-visible {
+    outline: 2px solid var(--mud-palette-primary);
+    outline-offset: 1px;
 }
 
-/* -- Undo toast: ledger entry with quiet action -- */
+/* -- Undo toast: tactile action with high-contrast pill -- */
 .undo-toast-body {
     display: flex;
     align-items: center;
-    gap: 0.85rem;
+    gap: 0.65rem;
     width: 100%;
-    padding: 0.85rem 0.9rem 0.85rem 0.85rem;
+    padding: 0.7rem 0.85rem;
+    box-sizing: border-box;
+}
+
+.undo-toast-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-md);
+    background: color-mix(in srgb, var(--mud-palette-primary) 12%, transparent);
+    color: var(--mud-palette-primary);
+}
+
+.undo-toast-icon .mud-icon {
+    font-size: 1.15rem !important;
 }
 
 .undo-toast-message {
     flex: 1;
     font-family: var(--hab-font-sans);
-    font-size: 0.84rem;
-    font-weight: 620;
+    font-size: 0.85rem;
+    font-weight: 550;
     letter-spacing: -0.01em;
     color: var(--mud-palette-text-primary);
-    line-height: 1.4;
+    line-height: 1.35;
     overflow-wrap: anywhere;
 }
 
@@ -836,29 +823,38 @@ input[type="number"].mud-input-slot {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.3rem;
-    background: var(--mud-palette-surface);
+    gap: 0.35rem;
+    background: color-mix(in srgb, var(--mud-palette-primary) 12%, transparent);
     color: var(--mud-palette-primary);
-    border: 1px solid color-mix(in srgb, var(--mud-palette-primary) 22%, var(--mud-palette-divider));
+    border: 1px solid color-mix(in srgb, var(--mud-palette-primary) 28%, transparent);
     border-radius: var(--radius-pill);
-    padding: 0.42rem 0.72rem;
+    padding: 0.35rem 0.75rem;
     font-family: var(--hab-font-sans);
-    font-size: 0.75rem;
-    font-weight: 750;
-    letter-spacing: 0.02em;
+    font-size: 0.8rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
     text-transform: none;
     cursor: pointer;
-    box-shadow: 0 1px 6px rgba(15,23,42,0.06);
     transition: background var(--dur-fast) ease, border-color var(--dur-fast) ease, transform var(--dur-fast) var(--ease-out), color var(--dur-fast) ease;
 }
 
 .undo-toast-btn:hover {
-    background: color-mix(in srgb, var(--mud-palette-primary) 9%, var(--mud-palette-surface));
-    border-color: color-mix(in srgb, var(--mud-palette-primary) 32%, transparent);
+    background: var(--mud-palette-primary);
+    color: var(--mud-palette-primary-contrast-text, #ffffff);
+    border-color: var(--mud-palette-primary);
 }
 
 .undo-toast-btn:active {
-    transform: scale(0.97);
+    transform: scale(0.95);
+}
+
+.undo-toast-btn:focus-visible {
+    outline: 2px solid var(--mud-palette-primary);
+    outline-offset: 2px;
+}
+
+.undo-toast-btn .mud-icon {
+    font-size: 0.95rem !important;
 }
 
 @media (max-width: 480px) {
@@ -867,7 +863,12 @@ input[type="number"].mud-input-slot {
         max-width: calc(100vw - 1rem) !important;
     }
     .toast-content {
-        padding: 0.8rem 0.75rem;
+        padding: 0.7rem 0.75rem;
+        gap: var(--space-3);
+    }
+    .undo-toast-body {
+        padding: 0.65rem 0.75rem;
+        gap: var(--space-3);
     }
 }
 
@@ -923,9 +924,8 @@ input[type="number"].mud-input-slot {
     border: 1px solid color-mix(in srgb, var(--mud-palette-divider) 60%, transparent) !important;
     background: var(--mud-palette-surface) !important;
     box-shadow:
-        0 1px 0 rgba(15,23,42,0.04),
-        0 12px 24px rgba(15,23,42,0.08),
-        0 32px 64px rgba(15,23,42,0.14) !important;
+        0 1px 3px light-dark(rgba(15, 23, 42, 0.08), rgba(0, 0, 0, 0.45)),
+        0 12px 32px light-dark(rgba(15, 23, 42, 0.12), rgba(0, 0, 0, 0.6)) !important;
     overflow: hidden !important;
 }
 

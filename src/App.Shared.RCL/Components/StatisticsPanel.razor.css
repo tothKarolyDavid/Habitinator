@@ -419,17 +419,6 @@
     overflow: hidden;
 }
 
-::deep .stats-kpi-card::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-    background: color-mix(in srgb, var(--kpi-accent, var(--mud-palette-primary)) 55%, transparent);
-}
-
 ::deep .stats-kpi-card--events {
     --kpi-accent: var(--mud-palette-primary);
 }
@@ -503,10 +492,6 @@
 }
 
 @media (min-width: 960px) {
-    ::deep .stats-kpi-cards--desktop .stats-kpi-card::before {
-        display: none;
-    }
-
     ::deep .stats-kpi-cards--desktop .stats-kpi-card--sidebar {
         padding: 0.85rem 0.95rem 0.9rem;
     }
@@ -520,10 +505,6 @@
     ::deep .stats-kpi-cards--desktop .stats-kpi-card__icon {
         color: var(--mud-palette-text-secondary);
     }
-}
-
-::deep .stats-kpi-card--plain::before {
-    display: none;
 }
 
 ::deep .stats-kpi-card--plain .stats-kpi-card__head,
@@ -662,12 +643,11 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-family: var(--hab-font-mono);
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.03em;
+    font-family: var(--hab-font-sans);
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
     color: var(--mud-palette-text-secondary);
-    font-variant-numeric: tabular-nums;
     margin-bottom: var(--space-3);
 }
 .stats-eyebrow__range {
@@ -676,6 +656,8 @@
     border: 1px solid color-mix(in srgb, var(--mud-palette-primary) 14%, transparent);
     padding: 0.15rem 0.45rem;
     border-radius: var(--radius-pill);
+    font-family: var(--hab-font-mono);
+    font-variant-numeric: tabular-nums;
 }
 .stats-eyebrow__dot { width: 3px; height: 3px; border-radius: 50%; background: var(--mud-palette-text-disabled); flex-shrink: 0; }
 
@@ -686,14 +668,6 @@
     width: 100%;
     background: var(--mud-palette-surface) !important;
     border: 1px solid color-mix(in srgb, var(--mud-palette-divider) 55%, transparent) !important;
-}
-.stats-hero-card::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 3px;
-    background: var(--hab-brand-gradient);
-    opacity: 0.9;
 }
 .stats-hero-head {
     display: flex;

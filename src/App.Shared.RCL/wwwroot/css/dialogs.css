@@ -41,17 +41,6 @@
 .hab-modal--wide,
 .daily-yesterday-shell { max-width: min(var(--hab-modal-wide-max-w), 100%); }
 
-/* Hairline type accent at top edge */
-.hab-modal::before,
-.edit-daily-shell::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 3px;
-    border-radius: var(--hab-modal-radius) var(--hab-modal-radius) 0 0;
-    background: var(--hab-modal-accent, var(--mud-palette-primary));
-    opacity: 0.9;
-}
 .hab-modal--habit,
 .edit-daily-shell--habit { --hab-modal-accent: var(--hab-type-habit); }
 .hab-modal--daily,
@@ -90,27 +79,9 @@
     z-index: 3;
 }
 .hab-modal__topbar--minimal { position: absolute; top: 0.55rem; right: 0.55rem; }
-.hab-modal__eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    font-family: var(--hab-font-sans);
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--hab-modal-accent);
-}
-.hab-modal__eyebrow-dot {
-    width: 7px; height: 7px; border-radius: 50%;
-    background: var(--hab-modal-accent);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--hab-modal-accent) 14%, transparent);
-    flex-shrink: 0;
-}
-.hab-modal__eyebrow svg { width: 13px; height: 13px; stroke-width: 2.2; }
 
 .edit-daily-header__toolbar { margin-bottom: 0.85rem; }
-.edit-daily-header__title { display: none; } /* replaced by eyebrow + title field */
+.edit-daily-header__title { display: none; }
 
 .hab-modal__actions {
     display: inline-flex;
@@ -128,24 +99,9 @@
     color: var(--mud-palette-text-secondary);
     white-space: nowrap;
 }
-.hab-modal__save-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--mud-palette-text-disabled);
-}
-.hab-modal__save--saving .hab-modal__save-dot {
-    background: var(--mud-palette-warning);
-    animation: save-pulse 1s ease infinite;
-}
-.hab-modal__save--saved .hab-modal__save-dot {
-    background: var(--hab-accent-success);
-}
-.hab-modal__save--error .hab-modal__save-dot { background: var(--mud-palette-error); }
 .hab-modal__save--saved { color: var(--hab-accent-success); }
 .hab-modal__save--error { color: var(--mud-palette-error); }
-
-.edit-daily-header__status { font-family: var(--hab-font-mono); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.03em; }
-.edit-daily-header__status--saved { color: var(--hab-accent-success); }
-.edit-daily-header__status--error { color: var(--mud-palette-error); }
+.hab-modal__save--saving { color: var(--mud-palette-warning); }
 
 .hab-modal__close,
 .edit-daily-header__close {
@@ -320,10 +276,6 @@
 }
 .hab-checklist__list { display: flex; flex-direction: column; }
 .edit-daily-checklist { display: contents; }
-.edit-daily-checklist-panels,
-.edit-daily-advanced { display: contents; }
-.edit-daily-checklist-panels .mud-expand-panel,
-.edit-daily-advanced .mud-expand-panel { display: none; } /* hide legacy expansion chrome -- we render list directly */
 .edit-daily-checklist__row {
     display: flex;
     align-items: center;
@@ -700,8 +652,7 @@
 .edit-daily-heatmap-btn__icon { flex-shrink: 0; color: var(--mud-palette-primary); }
 
 /* -- Archive / danger zone footer -- sticky at bottom, no extra scroll beyond */
-.hab-modal__footer,
-.edit-daily-delete-wrap {
+.hab-modal__footer {
     position: sticky;
     bottom: 0;
     display: flex;
@@ -714,8 +665,7 @@
     background: var(--mud-palette-surface);
     z-index: 1;
 }
-.hab-modal__footer .mud-button-root,
-.edit-daily-delete-wrap .mud-button-root {
+.hab-modal__footer .mud-button-root {
     text-transform: none !important;
     font-weight: 650 !important;
     font-size: 0.82rem !important;
@@ -731,9 +681,6 @@
     background: color-mix(in srgb, var(--mud-palette-warning) 10%, transparent) !important;
     color: var(--mud-palette-warning) !important;
 }
-
-/* Legacy footer mapping */
-.edit-daily-delete-wrap .mud-button-label { text-transform: none; font-weight: 650; font-size: 0.82rem; }
 
 /* -- Advanced collapsible -- subtle, no Mud panel chrome */
 .hab-advanced {
@@ -768,10 +715,6 @@
     flex-direction: column;
     gap: 0.8rem;
 }
-
-/* Hide legacy MudExpansion height animation gaps */
-.edit-daily-advanced .mud-expand-panel-header,
-.edit-daily-checklist-panels .mud-expand-panel-header { display: none; }
 
 /* Stats segment for period selection - used in stats page and daily heatmap dialog */
 .stats-segment {
@@ -865,5 +808,4 @@
     .hab-modal, .edit-daily-shell, .archived-dialog, .update-dialog, .daily-heatmap-dialog, .daily-yesterday-shell {
         animation: none !important;
     }
-    .hab-modal__save-dot { animation: none !important; }
 }
