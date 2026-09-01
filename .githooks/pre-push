@@ -1,0 +1,5 @@
+#!/bin/sh
+# sonar pre-push hook - installed by sonar integrate git
+SONAR_BIN=$(command -v sonar 2>/dev/null || :)
+[ -z "$SONAR_BIN" ] && { echo "sonarqube-cli not found, skipping secrets scan"; exit 0; }
+"$SONAR_BIN" hook git-pre-push
