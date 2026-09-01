@@ -4,6 +4,11 @@ updates:
     directory: /
     schedule:
       interval: weekly
+      day: monday
+    commit-message:
+      prefix: "build"
+      prefix-development: "build"
+      include: "scope"
     groups:
       actions:
         patterns:
@@ -13,7 +18,12 @@ updates:
     directory: /
     schedule:
       interval: weekly
+      day: monday
+    commit-message:
+      prefix: "build"
+      prefix-development: "build"
+      include: "scope"
     groups:
-      nuget:
+      dotnet:
         patterns:
           - "*"
