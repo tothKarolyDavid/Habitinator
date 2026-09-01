@@ -197,9 +197,13 @@ public sealed class BoardPersistenceService(
             .ThenBy(x => x.Id)
             .ToListAsync(cancellationToken);
 
-        var today = await TodayAsync(userId, cancellationToken);
-        var snapshot = BuildSnapshot(items, today, EmptyDailyStreaks);
+        var (today, dayStart) = await TodayAndDayStartAsync(userId, cancellationToken);
+        var dailies = items.Where(x => x.Section == BoardSection.Daily).ToList();
+        var dailyStreaks = await streakCalculator.BuildDailyStreakMapAsync(userId, dailies, today, dayStart, readDb, cancellationToken);
+        var snapshot = BuildSnapshot(items, today, dailyStreaks);
         snapshotCache.Set(userId, snapshot);
+        var streakMap = new Dictionary<Guid, int>(dailyStreaks);
+        streakCache.Set(userId, streakMap);
         return snapshot;
     }
 
