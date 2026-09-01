@@ -14,7 +14,7 @@ A cross-platform productivity app built with .NET MAUI and Blazor. Manage habits
 
 **Live Demo.** [habitinator.app](https://habitinator.app)
 
-[Demo](https://habitinator.app) | [Preview](#preview) | [Download](#download-and-install) | [Features](#key-features) | [Tech stack](#technology-stack) | [Getting Started](#getting-started)
+[Demo](https://habitinator.app) | [Preview](#preview) | [Download](#download-and-install) | [Features](#key-features) | [Tech stack](#technology-stack) | [Getting started](#getting-started)
 
 </div>
 
