@@ -10,8 +10,8 @@ namespace App.Web.Services;
 public static class PostgresMigrationConnectionStrings
 {
     public static string ResolvePrimary(IConfiguration configuration) =>
-        configuration.GetConnectionString("DefaultConnection")
-        ?? configuration.GetConnectionString("habitinatordb")
+        configuration.GetConnectionString("habitinatordb")
+        ?? configuration.GetConnectionString("DefaultConnection")
         ?? throw new InvalidOperationException(
             "No PostgreSQL connection string configured. Set ConnectionStrings:DefaultConnection or run through Aspire (habitinatordb).");
 
