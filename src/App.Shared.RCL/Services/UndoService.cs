@@ -21,7 +21,6 @@ public sealed class UndoService(
     private readonly ILogger<UndoService> _logger = logger;
 
     private List<Func<Task>>? _currentBatch;
-    private List<string>? _currentBatchKeys;
     private string? _currentBatchDescription;
     private int _undoingCount;
     private readonly SemaphoreSlim _undoLock = new(1, 1);
@@ -45,17 +44,13 @@ public sealed class UndoService(
             return Guid.Empty;
         }
 
-        if (_currentBatch is { } batch && _currentBatchKeys is { } keys)
+        if (_currentBatch is { } batch)
         {
             batch.Add(undoFunc);
-            foreach (var key in conflictKeys)
-            {
-                keys.Add(key);
-            }
             return Guid.Empty;
         }
 
-        var action = new UndoAction(description, undoFunc, conflictKeys);
+        var action = new UndoAction(description, undoFunc);
         action.SnackbarKey = $"{UndoSnackbarKeyPrefix}-{action.Id:N}";
 
         _undoStack.Add(action);
@@ -72,7 +67,6 @@ public sealed class UndoService(
     private void StartBatch(string description)
     {
         _currentBatch = [];
-        _currentBatchKeys = [];
         _currentBatchDescription = description;
     }
 
@@ -84,10 +78,8 @@ public sealed class UndoService(
         }
 
         var batch = _currentBatch;
-        var keys = _currentBatchKeys ?? [];
         var desc = _currentBatchDescription ?? "Multiple actions";
         _currentBatch = null;
-        _currentBatchKeys = null;
         _currentBatchDescription = null;
 
         if (batch.Count > 0)
@@ -99,7 +91,7 @@ public sealed class UndoService(
                 {
                     await batchAction().ConfigureAwait(false);
                 }
-            }, keys);
+            });
         }
     }
 
@@ -152,26 +144,7 @@ public sealed class UndoService(
             return null;
         }
 
-        var target = _undoStack[index];
-
-        // Undoing an older action out of order: any newer action that may touch the same state must
-        // be undone first, newest first, so the target's inverse applies to a consistent snapshot.
-        // Newer actions with disjoint keys are left pending. Their undos only revert their own change.
-        var toUndo = new List<UndoAction>();
-        if (actionId is not null)
-        {
-            for (var i = _undoStack.Count - 1; i > index; i--)
-            {
-                var newer = _undoStack[i];
-                if (MayConflict(target, newer))
-                {
-                    toUndo.Add(newer);
-                }
-            }
-        }
-
-        toUndo.Add(target);
-        return toUndo;
+        return [_undoStack[index]];
     }
 
     private async Task<List<UndoAction>?> ExecuteUndoAsync(List<UndoAction> toUndo)
@@ -210,20 +183,6 @@ public sealed class UndoService(
         {
             Interlocked.Decrement(ref _undoingCount);
         }
-    }
-
-    private static bool MayConflict(UndoAction a, UndoAction b)
-    {
-        if (a.ConflictKeys.Count == 0 || b.ConflictKeys.Count == 0)
-        {
-            // Unknown scope: assume it may touch anything so we never undo out of order against it.
-            return true;
-        }
-
-        return a.ConflictKeys.Any(ka => b.ConflictKeys.Any(kb =>
-            ka == kb
-            || ka.StartsWith(kb + ":", StringComparison.Ordinal)
-            || kb.StartsWith(ka + ":", StringComparison.Ordinal)));
     }
 
     private async Task ShowUndoSnackbarAsync(UndoAction action)
@@ -282,12 +241,11 @@ public sealed class UndoService(
         }
     }
 
-    private sealed class UndoAction(string description, Func<Task> undoFunc, IReadOnlyCollection<string> conflictKeys)
+    private sealed class UndoAction(string description, Func<Task> undoFunc)
     {
         public Guid Id { get; } = Guid.NewGuid();
         public string Description => description;
         public Func<Task> UndoFunc => undoFunc;
-        public IReadOnlyCollection<string> ConflictKeys => conflictKeys;
         public string? SnackbarKey { get; set; }
     }
 

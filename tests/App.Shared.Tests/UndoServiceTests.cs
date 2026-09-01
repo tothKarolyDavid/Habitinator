@@ -138,7 +138,7 @@ public sealed class UndoServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task UndoAsync_out_of_order_with_overlapping_keys_should_cascade_newer_first()
+    public async Task UndoAsync_out_of_order_with_overlapping_keys_should_only_undo_target_action()
     {
         List<string> undone = [];
 
@@ -160,13 +160,21 @@ public sealed class UndoServiceTests : IDisposable
 
         await _undoService.UndoAsync(firstId);
 
-        undone.Should().Equal("second", "first");
+        undone.Should().Equal("first");
         _undoService.CanUndo.Should().BeTrue();
         _undoService.LastActionDescription.Should().Be("Third");
+
+        // Remaining actions should still be undoable in LIFO order
+        await _undoService.UndoAsync();
+        undone.Should().Equal("first", "third");
+
+        await _undoService.UndoAsync();
+        undone.Should().Equal("first", "third", "second");
+        _undoService.CanUndo.Should().BeFalse();
     }
 
     [Fact]
-    public async Task UndoAsync_prefix_keys_should_cascade()
+    public async Task UndoAsync_prefix_keys_should_only_undo_target_action()
     {
         List<string> undone = [];
 
@@ -183,12 +191,13 @@ public sealed class UndoServiceTests : IDisposable
 
         await _undoService.UndoAsync(firstId);
 
-        undone.Should().Equal("edit", "create");
-        _undoService.CanUndo.Should().BeFalse();
+        undone.Should().Equal("create");
+        _undoService.CanUndo.Should().BeTrue();
+        _undoService.LastActionDescription.Should().Be("Edit");
     }
 
     [Fact]
-    public async Task UndoAsync_unknown_keys_should_cascade_all_newer()
+    public async Task UndoAsync_when_actions_have_no_keys_should_only_undo_target_action()
     {
         List<string> undone = [];
 
@@ -202,11 +211,68 @@ public sealed class UndoServiceTests : IDisposable
             undone.Add("second");
             return Task.CompletedTask;
         }, ["item:y:title"]);
+        _undoService.RegisterUndo("Third", () =>
+        {
+            undone.Add("third");
+            return Task.CompletedTask;
+        });
 
         await _undoService.UndoAsync(firstId);
 
-        undone.Should().Equal("second", "first");
+        undone.Should().Equal("first");
+        _undoService.CanUndo.Should().BeTrue();
+        _undoService.LastActionDescription.Should().Be("Third");
+    }
+
+    [Fact]
+    public async Task UndoAsync_middle_action_should_only_undo_middle_and_preserve_stack()
+    {
+        List<string> undone = [];
+
+        _undoService.RegisterUndo("First", () =>
+        {
+            undone.Add("first");
+            return Task.CompletedTask;
+        });
+        var secondId = _undoService.RegisterUndo("Second", () =>
+        {
+            undone.Add("second");
+            return Task.CompletedTask;
+        });
+        _undoService.RegisterUndo("Third", () =>
+        {
+            undone.Add("third");
+            return Task.CompletedTask;
+        });
+
+        await _undoService.UndoAsync(secondId);
+
+        undone.Should().Equal("second");
+        _undoService.CanUndo.Should().BeTrue();
+        _undoService.LastActionDescription.Should().Be("Third");
+
+        // Next parameterless undo pops "Third"
+        await _undoService.UndoAsync();
+        undone.Should().Equal("second", "third");
+        _undoService.CanUndo.Should().BeTrue();
+        _undoService.LastActionDescription.Should().Be("First");
+
+        // Next parameterless undo pops "First"
+        await _undoService.UndoAsync();
+        undone.Should().Equal("second", "third", "first");
         _undoService.CanUndo.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task UndoAsync_dismisses_only_target_toast_snackbar()
+    {
+        var firstId = _undoService.RegisterUndo("First", () => Task.CompletedTask);
+        var secondId = _undoService.RegisterUndo("Second", () => Task.CompletedTask);
+
+        await _undoService.UndoAsync(firstId);
+
+        _snackbar.Received(1).RemoveByKey($"habitinator-undo-{firstId:N}");
+        _snackbar.DidNotReceive().RemoveByKey($"habitinator-undo-{secondId:N}");
     }
 
     [Fact]
@@ -229,6 +295,68 @@ public sealed class UndoServiceTests : IDisposable
         await _undoService.UndoAsync(secondId);
 
         undone.Should().Equal("first", "second");
+    }
+
+    [Fact]
+    public async Task UndoAsync_nonexistent_id_should_noop()
+    {
+        var actionCalled = false;
+        _undoService.RegisterUndo("First", () =>
+        {
+            actionCalled = true;
+            return Task.CompletedTask;
+        });
+
+        await _undoService.UndoAsync(Guid.NewGuid());
+
+        actionCalled.Should().BeFalse();
+        _undoService.CanUndo.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task UndoAsync_out_of_order_sequence_preserves_independent_undo_states()
+    {
+        List<string> undone = [];
+
+        _undoService.RegisterUndo("A", () =>
+        {
+            undone.Add("A");
+            return Task.CompletedTask;
+        });
+        var idB = _undoService.RegisterUndo("B", () =>
+        {
+            undone.Add("B");
+            return Task.CompletedTask;
+        });
+        _undoService.RegisterUndo("C", () =>
+        {
+            undone.Add("C");
+            return Task.CompletedTask;
+        });
+        var idD = _undoService.RegisterUndo("D", () =>
+        {
+            undone.Add("D");
+            return Task.CompletedTask;
+        });
+
+        // Undo B first (older than C and D)
+        await _undoService.UndoAsync(idB);
+        undone.Should().Equal("B");
+        _undoService.LastActionDescription.Should().Be("D");
+
+        // Undo D
+        await _undoService.UndoAsync(idD);
+        undone.Should().Equal("B", "D");
+        _undoService.LastActionDescription.Should().Be("C");
+
+        // Ctrl+Z (parameterless) should undo C, then A
+        await _undoService.UndoAsync();
+        undone.Should().Equal("B", "D", "C");
+        _undoService.LastActionDescription.Should().Be("A");
+
+        await _undoService.UndoAsync();
+        undone.Should().Equal("B", "D", "C", "A");
+        _undoService.CanUndo.Should().BeFalse();
     }
 
     [Fact]

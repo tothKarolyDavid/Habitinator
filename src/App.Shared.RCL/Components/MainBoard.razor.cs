@@ -199,6 +199,7 @@ public partial class MainBoard : IAsyncDisposable
         try
         {
             await LoadBoardAsync();
+            await RefreshStreaksAsync();
         }
         catch
         {
@@ -526,8 +527,8 @@ public partial class MainBoard : IAsyncDisposable
                 // Ignore error when saving daily retro status as it's non-critical local UI state
             }
 
-            await RefreshStreaksAsync();
             await LoadBoardAsync();
+            await RefreshStreaksAsync();
         }
         catch (Exception)
         {
@@ -603,6 +604,7 @@ public partial class MainBoard : IAsyncDisposable
         {
             _lastLocalMutationTime = DateTimeOffset.UtcNow;
             await LoadBoardAsync();
+            await RefreshStreaksAsync();
             StateHasChanged();
         });
     }
