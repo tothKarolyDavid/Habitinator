@@ -39,6 +39,7 @@
 
 @code {
     [Parameter] public List<ChecklistRow> Value { get; set; } = [];
+    [Parameter] public EventCallback<List<ChecklistRow>> ValueChanged { get; set; }
 
     private void AddChecklistLine()
     {
