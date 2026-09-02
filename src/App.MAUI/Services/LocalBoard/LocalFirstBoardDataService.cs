@@ -334,9 +334,5 @@ public sealed partial class LocalFirstBoardDataService(
 
     private static BoardSnapshot EmptySnapshot() => new([], [], []);
 
-    private static TimeSpan Backoff(int attempt) =>
-        TimeSpan.FromSeconds(Math.Min(300, Math.Pow(2, Math.Min(attempt, 8))));
-
-
 }
 #pragma warning restore CA1001
