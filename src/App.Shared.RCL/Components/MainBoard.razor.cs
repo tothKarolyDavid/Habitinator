@@ -414,7 +414,9 @@ public partial class MainBoard : IAsyncDisposable
             return true;
         }
 
-        if (DailyChecklistJson.Parse(item.ChecklistJson).Any(line => line.Text.Contains(q, StringComparison.OrdinalIgnoreCase)))
+        if (!string.IsNullOrEmpty(item.ChecklistJson)
+            && item.ChecklistJson.Contains(q, StringComparison.OrdinalIgnoreCase)
+            && DailyChecklistJson.Parse(item.ChecklistJson).Any(line => line.Text.Contains(q, StringComparison.OrdinalIgnoreCase)))
         {
             return true;
         }
