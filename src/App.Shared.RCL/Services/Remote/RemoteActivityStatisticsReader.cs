@@ -341,9 +341,9 @@ public sealed class RemoteActivityStatisticsReader : IActivityStatisticsReader
             return true;
         }
 
-        if (TryReadLegacyOverview(periodKey, tag, out overview))
+        if (TryReadLegacyOverview(periodKey, tag, out overview) && overview != null)
         {
-            _cache[path] = (overview!, DateTime.UtcNow.AddMinutes(15));
+            _cache[path] = (overview, DateTime.UtcNow.AddMinutes(15));
             return true;
         }
 

@@ -90,76 +90,46 @@
 
     private string GetMonthLabel(int col)
     {
-        ActivityHeatmapCellDto? firstInCol = null;
-        for (var r = 0; r < 7; r++)
-        {
-            if (!Cells.TryGetValue((r, col), out var cell))
-            {
-                continue;
-            }
-
-            if (!cell.InDataRange)
-            {
-                continue;
-            }
-
-            if (firstInCol is null || cell.Date < firstInCol.Date)
-            {
-                firstInCol = cell;
-            }
-        }
-
-        if (firstInCol is null)
+        var firstDate = FindFirstDateInColumn(col);
+        if (firstDate is null || firstDate.Value.Day > 7)
         {
             return string.Empty;
         }
 
-        if (firstInCol.Date.Day > 7)
+        var label = firstDate.Value.ToString("MMM");
+        if (HasSameLabelInRecentColumns(col, label))
         {
             return string.Empty;
         }
 
-        if (col > 0)
-        {
-            for (var prev = col - 1; prev >= 0 && prev >= col - 2; prev--)
-            {
-                var prevLabel = GetMonthLabelNoRecursion(prev);
-                if (prevLabel == firstInCol.Date.ToString("MMM"))
-                {
-                    return string.Empty;
-                }
-            }
-        }
-
-        return firstInCol.Date.ToString("MMM");
+        return label;
     }
 
-    private string GetMonthLabelNoRecursion(int col)
+    private DateOnly? FindFirstDateInColumn(int col)
     {
-        ActivityHeatmapCellDto? firstInCol = null;
+        DateOnly? earliest = null;
         for (var r = 0; r < 7; r++)
         {
-            if (!Cells.TryGetValue((r, col), out var cell))
+            if (Cells.TryGetValue((r, col), out var cell) && cell.InDataRange && (earliest is null || cell.Date < earliest.Value))
             {
-                continue;
-            }
-
-            if (!cell.InDataRange)
-            {
-                continue;
-            }
-
-            if (firstInCol is null || cell.Date < firstInCol.Date)
-            {
-                firstInCol = cell;
+                earliest = cell.Date;
             }
         }
 
-        if (firstInCol is null || firstInCol.Date.Day > 7)
+        return earliest;
+    }
+
+    private bool HasSameLabelInRecentColumns(int col, string label)
+    {
+        for (var prev = col - 1; prev >= 0 && prev >= col - 2; prev--)
         {
-            return string.Empty;
+            var prevDate = FindFirstDateInColumn(prev);
+            if (prevDate is not null && prevDate.Value.Day <= 7 && prevDate.Value.ToString("MMM") == label)
+            {
+                return true;
+            }
         }
 
-        return firstInCol.Date.ToString("MMM");
+        return false;
     }
 }

@@ -148,80 +148,80 @@
         try
         {
             var data = await Stats.GetDailyContributionsAsync(_selectedPeriodKey);
-            _periodOptions = data.PeriodOptions;
-            if (!string.IsNullOrEmpty(data.PeriodKey)) _selectedPeriodKey = data.PeriodKey;
-            _graph = data.Graphs.FirstOrDefault(g => g.BoardItemId == BoardItemId);
-            if (_graph is null && !string.IsNullOrWhiteSpace(Title))
-                _graph = data.Graphs.FirstOrDefault(g => string.Equals(g.Title, Title, StringComparison.OrdinalIgnoreCase));
-            if (_graph is not null)
-            {
-                _cellIndex = _graph.Heatmap.ToDictionary(x => (x.DayRow, x.WeekCol));
-                _periodOptions = _periodOptions.Where(o => _graph.AvailablePeriodKeys.Contains(o.Key)).ToList();
-            }
-            else { _cellIndex = []; }
+            ApplyContributionData(data);
         }
         catch (Exception ex)
         {
-            var offline = ServiceProvider.GetService<OfflineActivityStatisticsProvider>();
-            if (offline != null)
+            if (await TryLoadOfflineFallbackAsync())
             {
-                try
-                {
-                    var data = await offline.BuildDailyContributionsAsync(_selectedPeriodKey, null);
-                    _periodOptions = data.PeriodOptions;
-                    if (!string.IsNullOrEmpty(data.PeriodKey))
-                    {
-                        _selectedPeriodKey = data.PeriodKey;
-                    }
-
-                    _graph = data.Graphs.FirstOrDefault(g => g.BoardItemId == BoardItemId);
-                    if (_graph is null && !string.IsNullOrWhiteSpace(Title))
-                    {
-                        _graph = data.Graphs.FirstOrDefault(g => string.Equals(g.Title, Title, StringComparison.OrdinalIgnoreCase));
-                    }
-
-                    if (_graph is not null)
-                    {
-                        _cellIndex = _graph.Heatmap.ToDictionary(x => (x.DayRow, x.WeekCol));
-                        _periodOptions = _periodOptions.Where(o => _graph.AvailablePeriodKeys.Contains(o.Key)).ToList();
-                    }
-                    else
-                    {
-                        _cellIndex = [];
-                    }
-
-                    _error = null;
-                    try
-                    {
-                        await Notifier.NotifyAsync("Offline: showing locally computed heatmap.", MudBlazor.Severity.Warning);
-                    }
-                    catch (Exception notifyEx)
-                    {
-                        // Ignore - best effort toast, fallback already rendered
-                        _ = notifyEx;
-                    }
-
-                    return;
-                }
-                catch (Exception fallbackEx)
-                {
-                    // Ignore - offline fallback failed, main error handling below
-                    _ = fallbackEx;
-                }
+                return;
             }
 
             _error = ex.Message;
-            try
-            {
-                await Notifier.NotifyAsync("Could not load daily history. Please try again.", MudBlazor.Severity.Error);
-            }
-            catch (Exception notifyEx)
-            {
-                // Ignore - best effort toast, fallback already rendered
-                _ = notifyEx;
-            }
+            await NotifySafeAsync("Could not load daily history. Please try again.", MudBlazor.Severity.Error);
         }
-        finally { _loading = false; }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void ApplyContributionData(DailyContributionsViewDto data)
+    {
+        _periodOptions = data.PeriodOptions;
+        if (!string.IsNullOrEmpty(data.PeriodKey))
+        {
+            _selectedPeriodKey = data.PeriodKey;
+        }
+
+        _graph = data.Graphs.FirstOrDefault(g => g.BoardItemId == BoardItemId)
+                 ?? (!string.IsNullOrWhiteSpace(Title)
+                     ? data.Graphs.FirstOrDefault(g => string.Equals(g.Title, Title, StringComparison.OrdinalIgnoreCase))
+                     : null);
+
+        if (_graph is not null)
+        {
+            _cellIndex = _graph.Heatmap.ToDictionary(x => (x.DayRow, x.WeekCol));
+            _periodOptions = _periodOptions.Where(o => _graph.AvailablePeriodKeys.Contains(o.Key)).ToList();
+        }
+        else
+        {
+            _cellIndex = [];
+        }
+    }
+
+    private async Task<bool> TryLoadOfflineFallbackAsync()
+    {
+        var offline = ServiceProvider.GetService<OfflineActivityStatisticsProvider>();
+        if (offline is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            var data = await offline.BuildDailyContributionsAsync(_selectedPeriodKey, null);
+            ApplyContributionData(data);
+            _error = null;
+            await NotifySafeAsync("Offline: showing locally computed heatmap.", MudBlazor.Severity.Warning);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private async Task NotifySafeAsync(string message, MudBlazor.Severity severity)
+    {
+        try
+        {
+            await Notifier.NotifyAsync(message, severity);
+        }
+        catch
+        {
+            // Best-effort toast
+        }
     }
 
     private async Task OnPeriodChangedAsync(string newPeriod)
